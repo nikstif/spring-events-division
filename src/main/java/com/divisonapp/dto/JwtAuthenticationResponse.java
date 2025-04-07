@@ -1,14 +1,14 @@
 package com.divisonapp.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-public class LoginResponse {
+@NoArgsConstructor
+@Builder
+public class JwtAuthenticationResponse {
     private String token;
 }

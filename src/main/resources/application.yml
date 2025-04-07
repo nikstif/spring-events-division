@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/divisiondb
+    username: nik
+    password: nik01
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+token:
+  signing:
+    key: B5VnL9u2L80Jv39XK8pQa1ZjTtRzG9YH3XhPpT+e8qA=
+
