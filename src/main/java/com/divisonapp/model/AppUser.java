@@ -26,9 +26,6 @@ public class AppUser implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;

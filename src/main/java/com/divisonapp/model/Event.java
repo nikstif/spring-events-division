@@ -18,23 +18,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "participants")
+@Table(name = "events")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Participant {
+public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false, unique = true)
-    private String phone;
+    @Column(length = 256)
+    private String description;
 
-    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<EventParticipant> eventLinks = new HashSet<>();
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<EventParticipant> participantLinks = new HashSet<>();
 }

@@ -16,9 +16,6 @@ public class UserService {
         if (repository.existsByUsername(user.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
-        if (repository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already exists");
-        }
         return repository.save(user);
     }
 

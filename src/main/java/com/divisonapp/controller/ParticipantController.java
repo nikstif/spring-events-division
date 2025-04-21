@@ -1,7 +1,10 @@
 package com.divisonapp.controller;
 
-import com.divisonapp.model.Participant;
-import com.divisonapp.repository.ParticipantRepository;
+import com.divisonapp.dto.event.EventDto;
+import com.divisonapp.dto.participant.ParticipantDto;
+import com.divisonapp.dto.participant.ParticipantRequest;
+import com.divisonapp.service.ParticipantService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,45 +22,37 @@ import java.util.List;
 @RequestMapping("/api/participants")
 @RequiredArgsConstructor
 public class ParticipantController {
-    private final ParticipantRepository participantRepository;
+
+    private final ParticipantService participantService;
 
     @GetMapping
-    public ResponseEntity<List<Participant>> getAllParticipants() {
-        return ResponseEntity.ok(participantRepository.findAll());
+    public ResponseEntity<List<ParticipantDto>> getAllParticipants() {
+        return ResponseEntity.ok(participantService.getAllParticipants());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Participant> getParticipantById(@PathVariable Long id) {
-        return participantRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ParticipantDto> getParticipantById(@PathVariable Long id) {
+        return participantService.getParticipantById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Participant> createParticipant(@RequestBody Participant participant) {
-        return ResponseEntity.ok(participantRepository.save(participant));
+    public ResponseEntity<ParticipantDto> createParticipant(@Valid @RequestBody ParticipantRequest request) {
+        return ResponseEntity.ok(participantService.createParticipant(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Participant> updateParticipant(@PathVariable Long id,
-                                                         @RequestBody Participant participantDetails) {
-        return participantRepository.findById(id)
-                .map(participant -> {
-                    participant.setName(participantDetails.getName());
-                    participant.setPayment(participantDetails.getPayment());
-                    participant.setEventId(participantDetails.getEventId());
-                    return ResponseEntity.ok(participantRepository.save(participant));
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ParticipantDto> updateParticipant(@PathVariable Long id,
+                                                            @Valid @RequestBody ParticipantRequest request) {
+        return participantService.updateParticipant(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteParticipant(@PathVariable Long id) {
-        return participantRepository.findById(id)
-                .map(participant -> {
-                    participantRepository.delete(participant);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> deleteParticipant(@PathVariable Long id) {
+        return participantService.deleteParticipant(id);
+    }
+
+    @GetMapping("/{participantId}/events")
+    public ResponseEntity<List<EventDto>> getParticipantEvents(@PathVariable Long participantId) {
+        return participantService.getParticipantEvents(participantId);
     }
 }

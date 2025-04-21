@@ -1,6 +1,7 @@
 package com.divisonapp.service;
 
 import com.divisonapp.dto.Transfer;
+import com.divisonapp.model.EventParticipant;
 import com.divisonapp.model.Participant;
 import org.springframework.stereotype.Service;
 
@@ -9,40 +10,44 @@ import java.util.List;
 
 @Service
 public class DivisionService {
-    private List<Participant> participants;
+    private List<EventParticipant> participants;
 
-    public List<Transfer> calculateTransfers(List<Participant> participants) {
+    public List<Transfer> calculateTransfers(List<EventParticipant> participants) {
         this.participants = participants;
         double totalSum = calculateTotalSum();
         double averageSum = totalSum / participants.size();
 
-        List<Participant> difference = calculateDifference(averageSum);
-        List<List<Participant>> listUnderpayersAndOverpayers = divideToUnderpayersAndOverpayers(difference);
+        List<EventParticipant> difference = calculateDifference(averageSum);
+        List<List<EventParticipant>> listUnderpayersAndOverpayers = divideToUnderpayersAndOverpayers(difference);
 
         return calculateMoneyTransfer(listUnderpayersAndOverpayers.get(0), listUnderpayersAndOverpayers.get(1));
     }
 
     private double calculateTotalSum() {
         double totalSum = 0;
-        for (Participant participant : participants) {
+        for (EventParticipant participant : participants) {
             totalSum += participant.getPayment();
         }
         return totalSum;
     }
 
-    private List<Participant> calculateDifference(double averageSum) {
-        List<Participant> difference = new ArrayList<>();
-        for (Participant participant : participants) {
-            difference.add(new Participant(participant.getName(), participant.getPayment() - averageSum, participant.getEventId()));
+    private List<EventParticipant> calculateDifference(double averageSum) {
+        List<EventParticipant> difference = new ArrayList<>();
+        for (EventParticipant participant : participants) {
+            Participant p = participant.getParticipant();
+            difference.add(EventParticipant.builder()
+                    .participant(p)
+                    .payment(participant.getPayment() - averageSum)
+                    .build());
         }
         return difference;
     }
 
-    private List<List<Participant>> divideToUnderpayersAndOverpayers(List<Participant> difference) {
-        List<Participant> underpayers = new ArrayList<>();
-        List<Participant> overpayers = new ArrayList<>();
+    private List<List<EventParticipant>> divideToUnderpayersAndOverpayers(List<EventParticipant> difference) {
+        List<EventParticipant> underpayers = new ArrayList<>();
+        List<EventParticipant> overpayers = new ArrayList<>();
 
-        for (Participant participant : difference) {
+        for (EventParticipant participant : difference) {
             if (participant.getPayment() < 0) {
                 underpayers.add(participant);
             } else if (participant.getPayment() > 0) {
@@ -50,32 +55,36 @@ public class DivisionService {
             }
         }
 
-        List<List<Participant>> result = new ArrayList<>();
+        List<List<EventParticipant>> result = new ArrayList<>();
         result.add(underpayers);
         result.add(overpayers);
         return result;
     }
 
-    private List<Transfer> calculateMoneyTransfer(List<Participant> underpayers, List<Participant> overpayers) {
+    private List<Transfer> calculateMoneyTransfer(List<EventParticipant> underpayers, List<EventParticipant> overpayers) {
         List<Transfer> transfers = new ArrayList<>();
         int underpayersIndex = 0;
         int overpayersIndex = 0;
 
         while (underpayersIndex < underpayers.size() && overpayersIndex < overpayers.size()) {
-            Participant underpayer = underpayers.get(underpayersIndex);
-            Participant overpayer = overpayers.get(overpayersIndex);
+            EventParticipant underpayer = underpayers.get(underpayersIndex);
+            EventParticipant overpayer = overpayers.get(overpayersIndex);
 
-            double transfer = Math.min(underpayer.getPayment() * (-1), overpayer.getPayment());
-            transfers.add(new Transfer(underpayer.getName(), overpayer.getName(), transfer));
+            double transfer = Math.min(-underpayer.getPayment(), overpayer.getPayment());
+            transfers.add(new Transfer(
+                    underpayer.getParticipant().getName(),
+                    overpayer.getParticipant().getName(),
+                    transfer
+            ));
 
             underpayer.setPayment(underpayer.getPayment() + transfer);
             overpayer.setPayment(overpayer.getPayment() - transfer);
 
-            if (underpayer.getPayment() == 0) {
+            if (Math.abs(underpayer.getPayment()) < 0.01) {
                 underpayersIndex++;
             }
 
-            if (overpayer.getPayment() == 0) {
+            if (Math.abs(overpayer.getPayment()) < 0.01) {
                 overpayersIndex++;
             }
         }

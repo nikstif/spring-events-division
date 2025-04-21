@@ -1,8 +1,8 @@
 package com.divisonapp.service;
 
-import com.divisonapp.dto.JwtAuthenticationResponse;
-import com.divisonapp.dto.SignInRequest;
-import com.divisonapp.dto.SignUpRequest;
+import com.divisonapp.dto.security.JwtAuthenticationResponse;
+import com.divisonapp.dto.security.SignInRequest;
+import com.divisonapp.dto.security.SignUpRequest;
 import com.divisonapp.model.AppUser;
 import com.divisonapp.model.Role;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,6 @@ public class AuthenticationService {
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
         var user = AppUser.builder()
                 .username(request.getUsername())
-                .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.ROLE_USER)
                 .build();
@@ -52,7 +51,7 @@ public class AuthenticationService {
 
     private String generateToken(UserDetails userDetails) {
         Instant now = Instant.now();
-        long expiry = 3600L; // 1 час
+        long expiry = 3600L;
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(userDetails.getUsername())

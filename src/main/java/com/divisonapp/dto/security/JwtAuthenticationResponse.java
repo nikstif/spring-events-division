@@ -1,4 +1,4 @@
-package com.divisonapp.dto;
+package com.divisonapp.dto.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,15 +1,15 @@
 package com.divisonapp.controller;
 
-import com.divisonapp.dto.JwtAuthenticationResponse;
-import com.divisonapp.dto.SignInRequest;
-import com.divisonapp.dto.SignUpRequest;
+import com.divisonapp.dto.security.JwtAuthenticationResponse;
+import com.divisonapp.dto.security.SignInRequest;
+import com.divisonapp.dto.security.SignUpRequest;
 import com.divisonapp.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 

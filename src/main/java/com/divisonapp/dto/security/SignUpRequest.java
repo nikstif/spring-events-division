@@ -1,10 +1,10 @@
-package com.divisonapp.dto;
+package com.divisonapp.dto.security;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class SignInRequest {
+public class SignUpRequest {
     @NotBlank
     @Size(min = 5, max = 50)
     private String username;

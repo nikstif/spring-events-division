@@ -1,8 +1,10 @@
 package com.divisonapp.controller;
 
 import com.divisonapp.dto.Transfer;
-import com.divisonapp.model.Participant;
-import com.divisonapp.repository.ParticipantRepository;
+import com.divisonapp.model.Event;
+import com.divisonapp.model.EventParticipant;
+import com.divisonapp.repository.EventParticipantRepository;
+import com.divisonapp.repository.EventRepository;
 import com.divisonapp.service.DivisionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,17 +20,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DivisionController {
 
-    private final ParticipantRepository participantRepository;
+    private final EventRepository eventRepository;
+    private final EventParticipantRepository eventParticipantRepository;
     private final DivisionService divisionService;
 
     @GetMapping("/transfers")
-    public ResponseEntity<List<Transfer>> calculateTransfers(@RequestParam Long eventId) {
-        List<Participant> participants = participantRepository.findByEventId(eventId);
+    public ResponseEntity<?> calculateTransfers(@RequestParam Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElse(null);
 
-        if (participants.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        if (event == null) {
+            return ResponseEntity.badRequest().body("event not found");
         }
 
-        return ResponseEntity.ok(divisionService.calculateTransfers(participants));
+        List<EventParticipant> participants = eventParticipantRepository.findByEvent(event);
+
+        if (participants.isEmpty()) {
+            return ResponseEntity.badRequest().body("no participants with payments in this event");
+        }
+
+        List<Transfer> result = divisionService.calculateTransfers(participants);
+        return ResponseEntity.ok(result);
     }
 }
