@@ -1,5 +1,6 @@
 package com.divisonapp.controller;
 
+import com.divisonapp.dto.transfer.AddParticipantRequest;
 import com.divisonapp.dto.event.EventDto;
 import com.divisonapp.dto.event.EventParticipantInfoDto;
 import com.divisonapp.dto.event.EventRequest;
@@ -55,12 +56,12 @@ public class EventController {
         return eventService.deleteEvent(id);
     }
 
-    @PostMapping("/{eventId}/add-participant/{participantId}")
+    @PostMapping("/{eventId}/add-participant")
     public ResponseEntity<?> addParticipantToEvent(@PathVariable Long eventId,
-                                                   @PathVariable Long participantId,
-                                                   @RequestParam @Positive(message = "payment must be more than 0") double payment) {
-        return eventService.addParticipantToEvent(eventId, participantId, payment);
+                                                   @RequestBody @Valid AddParticipantRequest request) {
+        return eventService.addParticipantToEvent(eventId, request.getParticipantId(), request.getPayment());
     }
+
 
     @DeleteMapping("/{eventId}/remove-participant/{participantId}")
     public ResponseEntity<?> removeParticipantFromEvent(@PathVariable Long eventId,

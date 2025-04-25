@@ -13,6 +13,7 @@ import java.util.Set;
 public interface EventMapper {
 
     @Mapping(source = "participantLinks", target = "participantIds")
+    @Mapping(target = "transfers", ignore = true)
     EventDto toDto(Event event);
 
     default List<Long> map(Set<EventParticipant> links) {

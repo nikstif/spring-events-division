@@ -1,15 +1,13 @@
-package com.divisonapp.dto;
+package com.divisonapp.dto.transfer;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Transfer {
+public class CalculatedTransfer {
     private String from;
     private String to;
     private double amount;

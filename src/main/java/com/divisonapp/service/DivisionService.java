@@ -1,6 +1,6 @@
 package com.divisonapp.service;
 
-import com.divisonapp.dto.Transfer;
+import com.divisonapp.dto.transfer.CalculatedTransfer;
 import com.divisonapp.model.EventParticipant;
 import com.divisonapp.model.Participant;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import java.util.List;
 public class DivisionService {
     private List<EventParticipant> participants;
 
-    public List<Transfer> calculateTransfers(List<EventParticipant> participants) {
+    public List<CalculatedTransfer> calculateTransfers(List<EventParticipant> participants) {
         this.participants = participants;
         double totalSum = calculateTotalSum();
         double averageSum = totalSum / participants.size();
@@ -61,8 +61,8 @@ public class DivisionService {
         return result;
     }
 
-    private List<Transfer> calculateMoneyTransfer(List<EventParticipant> underpayers, List<EventParticipant> overpayers) {
-        List<Transfer> transfers = new ArrayList<>();
+    private List<CalculatedTransfer> calculateMoneyTransfer(List<EventParticipant> underpayers, List<EventParticipant> overpayers) {
+        List<CalculatedTransfer> transfers = new ArrayList<>();
         int underpayersIndex = 0;
         int overpayersIndex = 0;
 
@@ -71,7 +71,7 @@ public class DivisionService {
             EventParticipant overpayer = overpayers.get(overpayersIndex);
 
             double transfer = Math.min(-underpayer.getPayment(), overpayer.getPayment());
-            transfers.add(new Transfer(
+            transfers.add(new CalculatedTransfer(
                     underpayer.getParticipant().getName(),
                     overpayer.getParticipant().getName(),
                     transfer

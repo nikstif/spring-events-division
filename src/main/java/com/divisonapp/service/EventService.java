@@ -1,5 +1,6 @@
 package com.divisonapp.service;
 
+import com.divisonapp.dto.transfer.Transfer;
 import com.divisonapp.dto.event.EventDto;
 import com.divisonapp.dto.event.EventParticipantInfoDto;
 import com.divisonapp.dto.event.EventRequest;
@@ -10,6 +11,7 @@ import com.divisonapp.model.Participant;
 import com.divisonapp.repository.EventParticipantRepository;
 import com.divisonapp.repository.EventRepository;
 import com.divisonapp.repository.ParticipantRepository;
+import com.divisonapp.repository.TransferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,19 +27,27 @@ public class EventService {
     private final EventRepository eventRepository;
     private final ParticipantRepository participantRepository;
     private final EventParticipantRepository eventParticipantRepository;
+    private final TransferRepository transferRepository;
     private final EventMapper eventMapper;
 
     public List<EventDto> getAllEvents() {
-        return eventRepository.findAll()
-                .stream()
-                .map(eventMapper::toDto)
+        return eventRepository.findAll().stream()
+                .map(event -> {
+                    EventDto dto = eventMapper.toDto(event);
+                    dto.setTransfers(getTransfersForEvent(event.getId()));
+                    return dto;
+                })
                 .toList();
     }
 
+
     public ResponseEntity<EventDto> getEventById(Long id) {
         return eventRepository.findById(id)
-                .map(eventMapper::toDto)
-                .map(ResponseEntity::ok)
+                .map(event -> {
+                    EventDto dto = eventMapper.toDto(event);
+                    dto.setTransfers(getTransfersForEvent(event.getId()));
+                    return ResponseEntity.ok(dto);
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -149,5 +159,15 @@ public class EventService {
         return ResponseEntity.ok("amount has been updated successfully");
     }
 
+    private List<Transfer> getTransfersForEvent(Long eventId) {
+        return transferRepository.findAllByEventId(eventId).stream()
+                .map(t -> new Transfer(
+                        t.getEventId(),
+                        t.getFromName(),
+                        t.getToName(),
+                        t.getAmount()
+                ))
+                .toList();
+    }
 
 }
