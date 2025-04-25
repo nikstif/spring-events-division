@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  division_postgres:
+    image: postgres:latest
+    container_name: division_pg
+    restart: always
+    environment:
+      POSTGRES_DB: divisiondb
+      POSTGRES_USER: nik
+      POSTGRES_PASSWORD: nik01
+    ports:
+      - "5434:5432"
+    volumes:
+      - division_pg_data:/var/lib/postgresql/data
+
+volumes:
+  division_pg_data:
